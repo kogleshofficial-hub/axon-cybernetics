@@ -1,239 +1,104 @@
-import TelemetryTicker from "@/components/TelemetryTicker";
+const nav = ["SYSTEMS", "CAPABILITIES", "FOUNDERS", "ROADMAP"];
 
-const capabilityRows = [
-  ["01", "NEXT.JS / TYPESCRIPT", "CLOUD APPLICATION FABRICATION"],
-  ["02", "SUPABASE / POSTGRESQL", "DATA + CONTROL PLANE LOGIC"],
-  ["03", "VERCEL DEVOPS", "EDGE DEPLOYMENT / DELIVERY"],
-  ["04", "PYTHON / OPENCV / TENSORFLOW", "VISION + PERCEPTION PIPELINE"],
-  ["05", "C++ MICROCONTROLLERS", "LOW-LEVEL EMBEDDED CONTROL"],
-  ["06", "MECHANICAL PROTOTYPING", "ROBOTIC CHASSIS / HARDWARE"],
+const capabilities = [
+  ["01", "AI ROBOTICS", "Machine intelligence designed to interpret real-world conditions and act on them."],
+  ["02", "EMBEDDED SYSTEMS", "Sensors, microcontrollers, electronics and mechanical integration."],
+  ["03", "CLOUD INTELLIGENCE", "Software infrastructure that turns physical-world signals into useful state."],
+  ["04", "AUTONOMOUS SYSTEMS", "Robotic behavior built around perception, reasoning and controlled action."],
 ];
 
-const gridPulseSignals = [
-  ["NETWORK", "GLOBAL UTILITY TELEMETRY"],
-  ["INGEST", "AUTHENTICATED NODE REPORTING"],
-  ["DATABASE", "GRIDPULSE / PRIVATE POSTGRES"],
-  ["VERIFICATION", "SERVER-SIDE TRANSFORMATION"],
+const roadmap = [
+  ["01", "FOUNDATION", "Software architecture, robotics research and engineering prototypes."],
+  ["02", "PROTOTYPE", "Build, test and document the first physical autonomous systems."],
+  ["03", "EXHIBITION", "Present working systems at international engineering and technology exhibitions."],
+  ["04", "COMMERCIAL", "After the founders reach the appropriate age, evaluate real-world deployment and product opportunities."],
 ];
 
 export default function Home() {
   return (
-    <main className="command-shell">
-      <div className="scanline" aria-hidden="true" />
-
-      <header className="system-header">
-        <div className="brand-lockup">
-          <span className="brand-mark">AX</span>
-          <div>
-            <p className="eyebrow">AXON CYBERNETICS</p>
-            <h1>COMMAND / 01</h1>
-          </div>
-        </div>
-
-        <div className="system-state" role="status" aria-live="polite">
-          <span className="live-dot" aria-hidden="true" />
-          <span>SYSTEM: OPERATIONAL</span>
-          <span className="state-divider">//</span>
-          <span>AGENTIC_ROBOTICS_LINK_ACTIVE</span>
-        </div>
-
-        <div className="header-meta">
-          <span>BUILD 01.0001</span>
-          <span>GLOBAL // UTC</span>
-        </div>
+    <main>
+      <header className="site-header">
+        <a className="logo" href="#top" aria-label="AXON Cybernetics home">
+          <span className="logo-box">AX</span>
+          <span>AXON<br /><b>CYBERNETICS</b></span>
+        </a>
+        <nav aria-label="Primary navigation">
+          {nav.map((item) => <a key={item} href={`#${item.toLowerCase()}`}>{item}</a>)}
+        </nav>
+        <a className="header-cta" href="#contact">CONTACT <span>↗</span></a>
       </header>
 
-      <section className="hero-grid" aria-labelledby="hero-title">
-        <div className="hero-copy">
-          <p className="section-index">[ AXON / INDUSTRIAL DEEP-TECH COLLECTIVE ]</p>
-          <h2 id="hero-title">
-            THE SOFTWARE
-            <br />
-            BRAIN MEETS
-            <br />
-            THE PHYSICAL BODY.
-          </h2>
-          <p className="hero-summary">
-            A joint engineering surface for cloud intelligence, embedded systems,
-            robotics hardware, and infrastructure telemetry. No decorative layer.
-            Just the control plane.
-          </p>
-          <div className="hero-actions">
-            <span className="action-tag">[ LIVE SYSTEM ]</span>
-            <span className="action-tag">[ EXHIBITION BUILD ]</span>
-            <span className="action-tag">[ IMAGINE CUP TRACK ]</span>
+      <section id="top" className="hero">
+        <div className="hero-image" aria-hidden="true">
+          <div className="robot-placeholder">
+            <span>AXON / FUTURE MACHINE</span>
+            <strong>HARDWARE<br />IN DEVELOPMENT</strong>
+            <small>NO PRODUCT CLAIMS // NO STOCK ROBOT</small>
           </div>
+          <div className="hero-crosshair">+</div>
         </div>
+        <div className="hero-content">
+          <p className="kicker">INDEPENDENT ROBOTICS &amp; AI ENGINEERING COLLECTIVE</p>
+          <h1>BUILDING<br /><em>INTELLIGENCE</em><br />FOR THE REAL WORLD.</h1>
+          <p className="hero-copy">AXON CYBERNETICS is a two-founder engineering collective exploring what happens when artificial intelligence, robotics hardware and cloud systems are designed as one machine.</p>
+          <div className="hero-links">
+            <a className="button button-dark" href="#systems">EXPLORE AXON <span>↘</span></a>
+            <a className="text-link" href="#founders">MEET THE FOUNDERS <span>↗</span></a>
+          </div>
+          <div className="hero-note"><span>01</span> CURRENTLY BUILDING / RESEARCH + PROTOTYPING</div>
+        </div>
+      </section>
 
-        <div className="hero-instrument" aria-label="Command center instrumentation">
-          <div className="instrument-topline">
-            <span>AXON.NODE / CORE</span>
-            <span>AUTH 100%</span>
-          </div>
-          <div className="instrument-grid">
-            <div className="instrument-cell large">
-              <span className="cell-label">CONTROL PLANE</span>
-              <strong>ONLINE</strong>
-              <span className="cell-code">NEXT / PG / EDGE</span>
-            </div>
-            <div className="instrument-cell">
-              <span className="cell-label">LATENCY</span>
-              <strong>&lt;100MS</strong>
-              <span className="cell-code">TARGET</span>
-            </div>
-            <div className="instrument-cell warning-cell">
-              <span className="cell-label">SAFETY</span>
-              <strong>HARD-FAIL</strong>
-              <span className="cell-code">NO SILENT DEGRADE</span>
-            </div>
-          </div>
-          <div className="instrument-footer">
-            <span>SYNC ████████████████████ 100%</span>
-            <span>RLS / ACTIVE</span>
+      <section className="statement-band">
+        <p>OUR APPROACH</p>
+        <h2>ROBOTS SHOULD NOT JUST<br /><span>OBEY COMMANDS.</span> THEY SHOULD<br />UNDERSTAND THE WORLD.</h2>
+      </section>
+
+      <section id="systems" className="section systems-section">
+        <div className="section-head">
+          <div><p className="eyebrow">01 / WHAT WE ARE BUILDING</p><h2>SYSTEMS, NOT GIMMICKS.</h2></div>
+          <p className="section-intro">We are intentionally early. This platform documents the engineering journey rather than pretending a prototype already exists.</p>
+        </div>
+        <div className="feature-grid">
+          <article className="feature feature-main">
+            <div className="feature-index">AXON / 001</div>
+            <div className="feature-visual"><span>PRIMARY ROBOTIC PLATFORM</span><strong>COMING<br />THROUGH<br />ENGINEERING</strong><small>PHYSICAL HARDWARE NOT YET DEPLOYED</small></div>
+            <div className="feature-bottom"><h3>AI-NATIVE ROBOTICS</h3><p>A future platform for perception, reasoning and action in physical environments.</p></div>
+          </article>
+          <div className="feature-stack">
+            <article className="feature small-feature"><span className="feature-index">AXON / 002</span><div><p className="eyebrow">INFRASTRUCTURE</p><h3>GRIDPULSE</h3><p>Utility telemetry architecture exploring how distributed physical nodes can report verified real-world conditions.</p><span className="status">RESEARCH / ACTIVE</span></div></article>
+            <article className="feature small-feature light-feature"><span className="feature-index">AXON / 003</span><div><p className="eyebrow">RESEARCH</p><h3>THE AUTONOMY LAB</h3><p>Experiments in computer vision, AI decision systems, embedded control and mechanical robotics.</p><span className="status dark-status">BUILDING / NEXT</span></div></article>
           </div>
         </div>
       </section>
 
-      <section className="dual-grid" aria-label="Unified technical capabilities">
-        <article className="capability-panel brain-panel">
-          <div className="panel-header">
-            <span className="panel-id">A-01</span>
-            <span className="panel-state">SOFTWARE BRAIN // ACTIVE</span>
-          </div>
-          <h3>SOFTWARE BRAIN</h3>
-          <p className="panel-lead">
-            Cloud architecture, data systems, deployment infrastructure, and the
-            decision logic that turns physical signals into actionable state.
-          </p>
-          <div className="capability-list">
-            {capabilityRows.slice(0, 3).map(([id, title, detail]) => (
-              <div className="capability-row" key={id}>
-                <span className="row-id">{id}</span>
-                <span className="row-title">{title}</span>
-                <span className="row-detail">{detail}</span>
-              </div>
-            ))}
-          </div>
-          <div className="owner-strip">
-            <span>DIRECTOR</span>
-            <strong>KOGLESH R. MURUGAN</strong>
-            <span>FULL-STACK / CLOUD / DATABASE</span>
-          </div>
-        </article>
-
-        <article className="capability-panel body-panel">
-          <div className="panel-header">
-            <span className="panel-id">B-01</span>
-            <span className="panel-state">HARDWARE BODY // ACTIVE</span>
-          </div>
-          <h3>HARDWARE BODY</h3>
-          <p className="panel-lead">
-            Embedded control, perception, chassis engineering, and the physical
-            systems that collect real-world evidence and execute commands.
-          </p>
-          <div className="capability-list">
-            {capabilityRows.slice(3).map(([id, title, detail]) => (
-              <div className="capability-row" key={id}>
-                <span className="row-id">{id}</span>
-                <span className="row-title">{title}</span>
-                <span className="row-detail">{detail}</span>
-              </div>
-            ))}
-            <div className="capability-row">
-              <span className="row-id">06</span>
-              <span className="row-title">CIRCUIT DESIGN</span>
-              <span className="row-detail">POWER / SENSOR / CONTROL INTERFACES</span>
-            </div>
-          </div>
-          <div className="owner-strip">
-            <span>DIRECTOR</span>
-            <strong>YENNAMUTAN MUTHUKUMARAN</strong>
-            <span>EMBEDDED / ROBOTICS / MECHANICAL</span>
-          </div>
-        </article>
-      </section>
-
-      <section className="gridpulse-panel" aria-labelledby="gridpulse-title">
-        <div className="gridpulse-heading">
-          <div>
-            <p className="section-index">[ INFRASTRUCTURE ENGINE / GP-01 ]</p>
-            <h2 id="gridpulse-title">GRIDPULSE</h2>
-            <p>GLOBAL UTILITY BLACKOUT TELEMETRY NETWORK</p>
-          </div>
-          <div className="pulse-state">
-            <span className="live-dot" aria-hidden="true" />
-            <strong>INGEST READY</strong>
-            <span>POST /api/telemetry/report</span>
-          </div>
-        </div>
-
-        <div className="gridpulse-grid">
-          <div className="telemetry-card">
-            <div className="telemetry-card-head">
-              <span>LIVE FEED / SYSTEM EVENTS</span>
-              <span className="terminal-green">● STREAM</span>
-            </div>
-            <TelemetryTicker />
-          </div>
-
-          <div className="telemetry-card specification-card">
-            <div className="telemetry-card-head">
-              <span>CONTROL SURFACE</span>
-              <span>LOCKED</span>
-            </div>
-            {gridPulseSignals.map(([label, value]) => (
-              <div className="spec-row" key={label}>
-                <span>{label}</span>
-                <strong>{value}</strong>
-              </div>
-            ))}
-            <div className="coordinates-block">
-              <span>GEO-DATA FORMAT</span>
-              <strong>DECIMAL LAT / LONG</strong>
-              <code>LAT ±90.000000 / LONG ±180.000000</code>
-            </div>
-            <div className="warning-banner">
-              <span>!</span>
-              <strong>SAFETY GATE</strong>
-              <p>UNVERIFIED HARDWARE PAYLOADS ARE REJECTED BEFORE TRANSACTION COMMIT.</p>
-            </div>
+      <section id="capabilities" className="capability-strip">
+        <div className="section capability-inner">
+          <div className="section-head compact"><div><p className="eyebrow">02 / CAPABILITIES</p><h2>ONE MACHINE.<br />MULTIPLE DISCIPLINES.</h2></div></div>
+          <div className="capability-grid">
+            {capabilities.map(([num, title, text]) => <article key={num}><span>{num}</span><h3>{title}</h3><p>{text}</p></article>)}
           </div>
         </div>
       </section>
 
-      <section className="engineering-log" aria-label="Engineering record">
-        <div className="log-title">
-          <span>ENGINEERING RECORD</span>
-          <span>NO. AXON-0001</span>
-        </div>
-        <div className="log-grid">
-          <div>
-            <span className="log-label">MISSION</span>
-            <strong>BUILD SYSTEMS THAT SURVIVE REAL-WORLD CONDITIONS.</strong>
-          </div>
-          <div>
-            <span className="log-label">PRINCIPLE</span>
-            <strong>MEASURE FIRST. VERIFY TWICE. SHIP THE HARD THING.</strong>
-          </div>
-          <div>
-            <span className="log-label">STATUS</span>
-            <strong className="terminal-green">OPERATIONAL / CONTINUOUS</strong>
-          </div>
+      <section id="founders" className="section founders-section">
+        <div className="section-head"><div><p className="eyebrow">03 / FOUNDERS</p><h2>TWO ENGINEERS.<br />ONE SYSTEM.</h2></div><p className="section-intro">AXON is intentionally small. Every part of the system has an owner, and every future machine must connect software decisions to physical reality.</p></div>
+        <div className="founder-grid">
+          <article className="founder-card"><div className="portrait-placeholder"><span>KRM</span><small>SOFTWARE / CLOUD / AI</small></div><div className="founder-copy"><p className="eyebrow">SOFTWARE BRAIN</p><h3>KOGLESH R.<br />MURUGAN</h3><p>Lead Full-Stack Cloud Architecture &amp; Database Logic. Next.js, TypeScript, PostgreSQL, Supabase and Vercel.</p><div className="founder-role">LEAD SOFTWARE / CLOUD ARCHITECTURE</div></div></article>
+          <article className="founder-card"><div className="portrait-placeholder orange"><span>YM</span><small>EMBEDDED / ROBOTICS</small></div><div className="founder-copy"><p className="eyebrow">PHYSICAL BODY</p><h3>YENNAMUTAN<br />MUTHUKUMARAN</h3><p>Lead Embedded Systems, Robotics Chassis &amp; Mechanical Hardware Prototyping. C++, Python, computer vision and circuit design.</p><div className="founder-role">LEAD ROBOTICS / EMBEDDED ENGINEERING</div></div></article>
         </div>
       </section>
 
-      <footer className="industrial-footer">
-        <div>
-          <strong>AXON CYBERNETICS</strong>
-          <span>ENGINEERING OWNERSHIP // SYSTEM RECORD</span>
-        </div>
-        <p>
-          © 2026 AXON CYBERNETICS. SYSTEM ARCHITECTURE, SOFTWARE, HARDWARE
-          CONCEPTS, AND ENGINEERING RECORDS CREDITED TO KOGLESH R. MURUGAN
-          (SOFTWARE BRAIN) AND YENNAMUTAN MUTHUKUMARAN (HARDWARE BODY).
-        </p>
-        <div className="footer-code">AXON//GRIDPULSE//01</div>
-      </footer>
+      <section className="principle-band"><div><p className="eyebrow">ENGINEERING PRINCIPLE</p><h2>IF IT CANNOT SURVIVE<br /><span>REAL-WORLD TESTING,</span><br />IT IS NOT FINISHED.</h2></div><div className="principle-number">AX<br />/02</div></section>
+
+      <section id="roadmap" className="section roadmap-section">
+        <div className="section-head"><div><p className="eyebrow">04 / ROADMAP</p><h2>FROM IDEA<br />TO MACHINE.</h2></div><p className="section-intro">No invented customer list. No imaginary fleet. No fake deployment numbers. The public record grows only when the engineering does.</p></div>
+        <div className="roadmap-list">{roadmap.map(([num, title, text]) => <article key={num}><span>{num}</span><div><h3>{title}</h3><p>{text}</p></div><b>↗</b></article>)}</div>
+      </section>
+
+      <section id="contact" className="contact-section"><p className="eyebrow">AXON CYBERNETICS / 2026</p><h2>THE MACHINE<br /><em>IS NEXT.</em></h2><p>For engineering collaboration, exhibition opportunities or technical enquiries, contact the founders.</p><a className="button button-light" href="mailto:axoncybernetics@gmail.com">CONTACT AXON <span>↗</span></a></section>
+
+      <footer className="site-footer"><div className="footer-brand"><span className="logo-box">AX</span><strong>AXON CYBERNETICS</strong></div><div>AI ROBOTICS / EMBEDDED SYSTEMS / CLOUD INTELLIGENCE</div><div>© 2026 AXON CYBERNETICS</div></footer>
     </main>
   );
 }
