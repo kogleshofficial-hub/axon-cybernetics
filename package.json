@@ -22,8 +22,5 @@
     "eslint": "^9.36.0",
     "eslint-config-next": "^16.0.0",
     "typescript": "^5.9.2"
-  },
-  "engines": {
-    "node": "22.x"
   }
 }
