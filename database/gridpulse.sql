@@ -7,7 +7,6 @@ BEGIN;
 CREATE SCHEMA IF NOT EXISTS gridpulse;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- Node registry: the token hash is unique here, not on every outage row.
 CREATE TABLE IF NOT EXISTS gridpulse.reporting_nodes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   node_id text NOT NULL UNIQUE,
@@ -98,25 +97,31 @@ BEFORE INSERT OR UPDATE OF reported_at, outage_started_at, outage_resolved_at
 ON gridpulse.grid_outages
 FOR EACH ROW EXECUTE FUNCTION gridpulse.calculate_downtime();
 
--- Private schema: no public Data API exposure.
 REVOKE ALL ON SCHEMA gridpulse FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA gridpulse FROM PUBLIC;
 REVOKE ALL ON ALL SEQUENCES IN SCHEMA gridpulse FROM PUBLIC;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA gridpulse FROM PUBLIC;
 
--- RLS is forced for defense in depth. The application explicitly opts into the
--- ingestion policies inside a transaction with SET LOCAL; client-facing roles do not.
 ALTER TABLE gridpulse.reporting_nodes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gridpulse.reporting_nodes FORCE ROW LEVEL SECURITY;
 ALTER TABLE gridpulse.grid_outages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gridpulse.grid_outages FORCE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS reporting_nodes_ingest_select ON gridpulse.reporting_nodes;
 DROP POLICY IF EXISTS reporting_nodes_ingest_only ON gridpulse.reporting_nodes;
+DROP POLICY IF EXISTS reporting_nodes_ingest_update ON gridpulse.reporting_nodes;
 DROP POLICY IF EXISTS reporting_nodes_deny_anon ON gridpulse.reporting_nodes;
 DROP POLICY IF EXISTS reporting_nodes_deny_authenticated ON gridpulse.reporting_nodes;
 DROP POLICY IF EXISTS grid_outages_ingest_only ON gridpulse.grid_outages;
 DROP POLICY IF EXISTS grid_outages_deny_anon ON gridpulse.grid_outages;
 DROP POLICY IF EXISTS grid_outages_deny_authenticated ON gridpulse.grid_outages;
+
+CREATE POLICY reporting_nodes_ingest_select
+  ON gridpulse.reporting_nodes
+  AS PERMISSIVE
+  FOR SELECT
+  TO PUBLIC
+  USING (current_setting('app.gridpulse_ingest', true) = 'true');
 
 CREATE POLICY reporting_nodes_ingest_only
   ON gridpulse.reporting_nodes
@@ -177,5 +182,5 @@ COMMIT;
 -- IMPORTANT:
 -- The server-side DATABASE_URL must never be exposed as NEXT_PUBLIC_*.
 -- The ingest connection needs USAGE on schema gridpulse and INSERT on
--- grid_outages plus INSERT/UPDATE on reporting_nodes. The route sets
+-- grid_outages plus SELECT/INSERT/UPDATE on reporting_nodes. The route sets
 -- app.gridpulse_ingest only for the transaction; it is never persisted.
