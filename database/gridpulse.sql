@@ -1,12 +1,10 @@
 -- AXON CYBERNETICS // GRIDPULSE
 -- Isolated PostgreSQL telemetry schema.
 -- Execute as the database owner/migration role.
--- The ingestion service should connect with a tightly scoped server-side role.
 
 BEGIN;
 
 CREATE SCHEMA IF NOT EXISTS gridpulse;
-
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE IF NOT EXISTS gridpulse.grid_outages (
@@ -38,20 +36,11 @@ CREATE TABLE IF NOT EXISTS gridpulse.grid_outages (
   CONSTRAINT grid_outages_downtime_valid CHECK (downtime_seconds >= 0)
 );
 
-CREATE INDEX IF NOT EXISTS grid_outages_node_id_idx
-  ON gridpulse.grid_outages (node_id);
-
-CREATE INDEX IF NOT EXISTS grid_outages_reported_at_idx
-  ON gridpulse.grid_outages (reported_at DESC);
-
-CREATE INDEX IF NOT EXISTS grid_outages_outage_started_at_idx
-  ON gridpulse.grid_outages (outage_started_at DESC);
-
-CREATE INDEX IF NOT EXISTS grid_outages_geo_idx
-  ON gridpulse.grid_outages (latitude, longitude);
-
-CREATE INDEX IF NOT EXISTS grid_outages_active_idx
-  ON gridpulse.grid_outages (node_id, outage_started_at DESC)
+CREATE INDEX IF NOT EXISTS grid_outages_node_id_idx ON gridpulse.grid_outages (node_id);
+CREATE INDEX IF NOT EXISTS grid_outages_reported_at_idx ON gridpulse.grid_outages (reported_at DESC);
+CREATE INDEX IF NOT EXISTS grid_outages_outage_started_at_idx ON gridpulse.grid_outages (outage_started_at DESC);
+CREATE INDEX IF NOT EXISTS grid_outages_geo_idx ON gridpulse.grid_outages (latitude, longitude);
+CREATE INDEX IF NOT EXISTS grid_outages_active_idx ON gridpulse.grid_outages (node_id, outage_started_at DESC)
   WHERE outage_resolved_at IS NULL;
 
 CREATE OR REPLACE FUNCTION gridpulse.set_updated_at()
@@ -80,30 +69,35 @@ $$;
 DROP TRIGGER IF EXISTS grid_outages_updated_at ON gridpulse.grid_outages;
 CREATE TRIGGER grid_outages_updated_at
 BEFORE UPDATE ON gridpulse.grid_outages
-FOR EACH ROW
-EXECUTE FUNCTION gridpulse.set_updated_at();
+FOR EACH ROW EXECUTE FUNCTION gridpulse.set_updated_at();
 
 DROP TRIGGER IF EXISTS grid_outages_downtime ON gridpulse.grid_outages;
 CREATE TRIGGER grid_outages_downtime
 BEFORE INSERT OR UPDATE OF reported_at, outage_started_at, outage_resolved_at
 ON gridpulse.grid_outages
-FOR EACH ROW
-EXECUTE FUNCTION gridpulse.calculate_downtime();
+FOR EACH ROW EXECUTE FUNCTION gridpulse.calculate_downtime();
 
--- Defense in depth: this schema is not a public Data API surface.
+-- Private schema: no public Data API exposure.
 REVOKE ALL ON SCHEMA gridpulse FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA gridpulse FROM PUBLIC;
 REVOKE ALL ON ALL SEQUENCES IN SCHEMA gridpulse FROM PUBLIC;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA gridpulse FROM PUBLIC;
 
--- RLS is mandatory even though the schema is private.
+-- RLS is forced for defense in depth. The application explicitly opts into the
+-- ingestion policy inside a transaction with SET LOCAL; client-facing roles do not.
 ALTER TABLE gridpulse.grid_outages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gridpulse.grid_outages FORCE ROW LEVEL SECURITY;
 
--- No client-facing role can read or mutate telemetry directly.
+DROP POLICY IF EXISTS grid_outages_ingest_only ON gridpulse.grid_outages;
 DROP POLICY IF EXISTS grid_outages_deny_anon ON gridpulse.grid_outages;
 DROP POLICY IF EXISTS grid_outages_deny_authenticated ON gridpulse.grid_outages;
-DROP POLICY IF EXISTS grid_outages_deny_public ON gridpulse.grid_outages;
+
+CREATE POLICY grid_outages_ingest_only
+  ON gridpulse.grid_outages
+  AS PERMISSIVE
+  FOR INSERT
+  TO PUBLIC
+  WITH CHECK (current_setting('app.gridpulse_ingest', true) = 'true');
 
 CREATE POLICY grid_outages_deny_anon
   ON gridpulse.grid_outages
@@ -121,17 +115,10 @@ CREATE POLICY grid_outages_deny_authenticated
   USING (false)
   WITH CHECK (false);
 
-CREATE POLICY grid_outages_deny_public
-  ON gridpulse.grid_outages
-  AS RESTRICTIVE
-  FOR ALL
-  TO PUBLIC
-  USING (false)
-  WITH CHECK (false);
-
 COMMIT;
 
 -- IMPORTANT:
--- The server-side DATABASE_URL used by the ingestion route must belong to a role
--- that is intentionally permitted to write to this private schema. Do not expose
--- that role, its password, or DATABASE_URL to the browser or any NEXT_PUBLIC_* env var.
+-- The server-side DATABASE_URL must never be exposed as NEXT_PUBLIC_*.
+-- The ingest connection must have USAGE on schema gridpulse and INSERT on
+-- gridpulse.grid_outages. The route sets app.gridpulse_ingest only for its
+-- single INSERT transaction; it is transaction-local and cannot be persisted.
