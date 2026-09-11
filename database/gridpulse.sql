@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS gridpulse.reporting_nodes (
   reporting_node_token_hash char(64) NOT NULL UNIQUE,
   first_seen_at timestamptz NOT NULL DEFAULT now(),
   last_seen_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
   active boolean NOT NULL DEFAULT true,
   CONSTRAINT reporting_nodes_node_id_format CHECK (node_id ~ '^[A-Za-z0-9._:-]{2,96}$')
 );
@@ -119,63 +120,51 @@ DROP POLICY IF EXISTS grid_outages_deny_authenticated ON gridpulse.grid_outages;
 CREATE POLICY reporting_nodes_ingest_select
   ON gridpulse.reporting_nodes
   AS PERMISSIVE
-  FOR SELECT
-  TO PUBLIC
+  FOR SELECT TO PUBLIC
   USING (current_setting('app.gridpulse_ingest', true) = 'true');
 
 CREATE POLICY reporting_nodes_ingest_only
   ON gridpulse.reporting_nodes
   AS PERMISSIVE
-  FOR INSERT
-  TO PUBLIC
+  FOR INSERT TO PUBLIC
   WITH CHECK (current_setting('app.gridpulse_ingest', true) = 'true');
 
 CREATE POLICY reporting_nodes_ingest_update
   ON gridpulse.reporting_nodes
   AS PERMISSIVE
-  FOR UPDATE
-  TO PUBLIC
+  FOR UPDATE TO PUBLIC
   USING (current_setting('app.gridpulse_ingest', true) = 'true')
   WITH CHECK (current_setting('app.gridpulse_ingest', true) = 'true');
 
 CREATE POLICY reporting_nodes_deny_anon
   ON gridpulse.reporting_nodes
   AS RESTRICTIVE
-  FOR ALL
-  TO anon
-  USING (false)
-  WITH CHECK (false);
+  FOR ALL TO anon
+  USING (false) WITH CHECK (false);
 
 CREATE POLICY reporting_nodes_deny_authenticated
   ON gridpulse.reporting_nodes
   AS RESTRICTIVE
-  FOR ALL
-  TO authenticated
-  USING (false)
-  WITH CHECK (false);
+  FOR ALL TO authenticated
+  USING (false) WITH CHECK (false);
 
 CREATE POLICY grid_outages_ingest_only
   ON gridpulse.grid_outages
   AS PERMISSIVE
-  FOR INSERT
-  TO PUBLIC
+  FOR INSERT TO PUBLIC
   WITH CHECK (current_setting('app.gridpulse_ingest', true) = 'true');
 
 CREATE POLICY grid_outages_deny_anon
   ON gridpulse.grid_outages
   AS RESTRICTIVE
-  FOR ALL
-  TO anon
-  USING (false)
-  WITH CHECK (false);
+  FOR ALL TO anon
+  USING (false) WITH CHECK (false);
 
 CREATE POLICY grid_outages_deny_authenticated
   ON gridpulse.grid_outages
   AS RESTRICTIVE
-  FOR ALL
-  TO authenticated
-  USING (false)
-  WITH CHECK (false);
+  FOR ALL TO authenticated
+  USING (false) WITH CHECK (false);
 
 COMMIT;
 
