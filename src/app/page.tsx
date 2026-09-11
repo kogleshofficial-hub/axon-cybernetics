@@ -48,11 +48,6 @@ export default function Home() {
         <h1>INTELLIGENCE<br /><span>THAT MOVES.</span></h1>
         <a className="hero-button" href="#machines">EXPLORE THE SYSTEM <b>↓</b></a>
       </div>
-      <div className="hero-bottom">
-        <div><span>BUILT BY</span><strong>KOGLESH R. MURUGAN</strong><small>SOFTWARE / CLOUD / DATABASE</small></div>
-        <div><span>BUILT BY</span><strong>YENNAMUTAN MUTHUKUMARAN</strong><small>EMBEDDED / ROBOTICS / MECHANICAL</small></div>
-        <div><span>TRACK</span><strong>IMAGINE CUP / DEEP TECH</strong><small>CONCEPT → PROTOTYPE → FIELD</small></div>
-      </div>
     </section>
 
     <section className="manifesto"><span>AXON / ENGINEERING THESIS</span><h2>ROBOTS SHOULD NOT<br />JUST OBEY. <em>THEY SHOULD UNDERSTAND.</em></h2><p>AXON is a two-founder engineering collective building toward autonomous robotics. The systems shown here are future programs and design directions, presented honestly as work toward physical prototypes.</p></section>
