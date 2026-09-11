@@ -11,7 +11,7 @@ const roadmap = [
   ["01", "FOUNDATION", "Software architecture, robotics research and engineering prototypes."],
   ["02", "PROTOTYPE", "Build, test and document the first physical autonomous systems."],
   ["03", "EXHIBITION", "Present working systems at international engineering and technology exhibitions."],
-  ["04", "COMMERCIAL", "After the founders reach the appropriate age, evaluate real-world deployment and product opportunities."],
+  ["04", "COMMERCIAL", "When the engineering is mature and the founders are ready, evaluate real-world deployment and product opportunities."],
 ];
 
 export default function Home() {
@@ -25,7 +25,7 @@ export default function Home() {
         <nav aria-label="Primary navigation">
           {nav.map((item) => <a key={item} href={`#${item.toLowerCase()}`}>{item}</a>)}
         </nav>
-        <a className="header-cta" href="#contact">CONTACT <span>↗</span></a>
+        <a className="header-cta" href="https://github.com/kogleshofficial-hub/axon-cybernetics">BUILD LOG <span>↗</span></a>
       </header>
 
       <section id="top" className="hero">
@@ -96,7 +96,7 @@ export default function Home() {
         <div className="roadmap-list">{roadmap.map(([num, title, text]) => <article key={num}><span>{num}</span><div><h3>{title}</h3><p>{text}</p></div><b>↗</b></article>)}</div>
       </section>
 
-      <section id="contact" className="contact-section"><p className="eyebrow">AXON CYBERNETICS / 2026</p><h2>THE MACHINE<br /><em>IS NEXT.</em></h2><p>For engineering collaboration, exhibition opportunities or technical enquiries, contact the founders.</p><a className="button button-light" href="mailto:axoncybernetics@gmail.com">CONTACT AXON <span>↗</span></a></section>
+      <section id="contact" className="contact-section"><p className="eyebrow">AXON CYBERNETICS / 2026</p><h2>THE MACHINE<br /><em>IS NEXT.</em></h2><p>For engineering collaboration, exhibition opportunities or technical enquiries, follow the public build record and contact the founders through their professional channels.</p><a className="button button-light" href="https://github.com/kogleshofficial-hub/axon-cybernetics">VIEW BUILD LOG <span>↗</span></a></section>
 
       <footer className="site-footer"><div className="footer-brand"><span className="logo-box">AX</span><strong>AXON CYBERNETICS</strong></div><div>AI ROBOTICS / EMBEDDED SYSTEMS / CLOUD INTELLIGENCE</div><div>© 2026 AXON CYBERNETICS</div></footer>
     </main>
