@@ -1,104 +1,121 @@
-const nav = ["SYSTEMS", "CAPABILITIES", "FOUNDERS", "ROADMAP"];
+const nav = ["MACHINES", "INTELLIGENCE", "FOUNDERS", "ROADMAP"];
 
-const capabilities = [
-  ["01", "AI ROBOTICS", "Machine intelligence designed to interpret real-world conditions and act on them."],
-  ["02", "EMBEDDED SYSTEMS", "Sensors, microcontrollers, electronics and mechanical integration."],
-  ["03", "CLOUD INTELLIGENCE", "Software infrastructure that turns physical-world signals into useful state."],
-  ["04", "AUTONOMOUS SYSTEMS", "Robotic behavior built around perception, reasoning and controlled action."],
+const machines = [
+  {
+    id: "AX-01",
+    name: "AEGIS",
+    type: "AUTONOMOUS FIELD PLATFORM",
+    mission: "A future mobile robotic platform for inspection, mapping and environmental awareness in places where human access is limited.",
+    intelligence: "PERCEPTION / LOCAL REASONING / AUTONOMOUS NAVIGATION",
+    body: "MOBILE CHASSIS / SENSOR ARRAY / EMBEDDED CONTROL",
+    state: "CONCEPT / RESEARCH",
+  },
+  {
+    id: "AX-02",
+    name: "SENTINEL",
+    type: "INFRASTRUCTURE INTELLIGENCE UNIT",
+    mission: "A future robotic system designed to observe infrastructure conditions and turn physical signals into actionable system state.",
+    intelligence: "COMPUTER VISION / SENSOR FUSION / CLOUD TELEMETRY",
+    body: "MODULAR SENSOR BODY / EDGE COMPUTE / FIELD LINK",
+    state: "CONCEPT / RESEARCH",
+  },
+  {
+    id: "AX-03",
+    name: "ORBIT",
+    type: "ADAPTIVE SERVICE ROBOT",
+    mission: "A long-term exploration platform for robots that can perceive changing environments and choose actions instead of following a fixed script.",
+    intelligence: "WORLD MODEL / DECISION SYSTEMS / CONTROL",
+    body: "RECONFIGURABLE BODY / ACTUATION / EMBEDDED AI",
+    state: "FUTURE PROGRAM",
+  },
+];
+
+const intelligence = [
+  ["01", "SEE", "Computer vision, sensor inputs and environmental perception."],
+  ["02", "UNDERSTAND", "Software models that turn raw signals into a usable picture of the world."],
+  ["03", "DECIDE", "Reasoning and control logic for selecting actions under changing conditions."],
+  ["04", "MOVE", "Embedded systems, actuation and mechanical design that turn decisions into physical action."],
 ];
 
 const roadmap = [
-  ["01", "FOUNDATION", "Software architecture, robotics research and engineering prototypes."],
-  ["02", "PROTOTYPE", "Build, test and document the first physical autonomous systems."],
-  ["03", "EXHIBITION", "Present working systems at international engineering and technology exhibitions."],
-  ["04", "COMMERCIAL", "When the engineering is mature and the founders are ready, evaluate real-world deployment and product opportunities."],
+  ["01", "FOUNDATION", "Build the software brain, simulation systems and engineering architecture."],
+  ["02", "FIRST BODY", "Prototype the first physical robotic platform and validate the core control loop."],
+  ["03", "FIELD TEST", "Take working systems outside the lab, measure failure and iterate."],
+  ["04", "EXHIBITION", "Present verified working technology at international engineering exhibitions."],
 ];
+
+function MachineCard({ machine, featured = false }: { machine: typeof machines[number]; featured?: boolean }) {
+  return (
+    <article className={`machine-card ${featured ? "machine-featured" : ""}`}>
+      <div className="machine-top">
+        <span>{machine.id}</span><span>{machine.state}</span>
+      </div>
+      <div className="machine-drawing" aria-hidden="true">
+        <div className="drawing-grid" />
+        <div className="robot-silhouette"><i /><b /><em /></div>
+        <span className="drawing-label label-a">AXON / DESIGN STUDY</span>
+        <span className="drawing-label label-b">{machine.body}</span>
+        <span className="drawing-label label-c">NOT A PRODUCTION UNIT</span>
+        <div className="drawing-cross">+</div>
+      </div>
+      <div className="machine-info">
+        <p className="eyebrow">{machine.type}</p>
+        <h3>{machine.name}</h3>
+        <p>{machine.mission}</p>
+        <div className="machine-specs"><span>INTELLIGENCE</span><strong>{machine.intelligence}</strong></div>
+        <div className="machine-specs"><span>PHYSICAL SYSTEM</span><strong>{machine.body}</strong></div>
+      </div>
+    </article>
+  );
+}
 
 export default function Home() {
   return (
     <main>
       <header className="site-header">
-        <a className="logo" href="#top" aria-label="AXON Cybernetics home">
-          <span className="logo-box">AX</span>
-          <span>AXON<br /><b>CYBERNETICS</b></span>
-        </a>
-        <nav aria-label="Primary navigation">
-          {nav.map((item) => <a key={item} href={`#${item.toLowerCase()}`}>{item}</a>)}
-        </nav>
-        <a className="header-cta" href="https://github.com/kogleshofficial-hub/axon-cybernetics">BUILD LOG <span>↗</span></a>
+        <a className="logo" href="#top" aria-label="AXON Cybernetics home"><span className="logo-box">AX</span><span>AXON<br /><b>CYBERNETICS</b></span></a>
+        <nav>{nav.map((item) => <a key={item} href={`#${item.toLowerCase()}`}>{item}</a>)}</nav>
+        <a className="header-cta" href="https://github.com/kogleshofficial-hub/axon-cybernetics">BUILD RECORD ↗</a>
       </header>
 
-      <section id="top" className="hero">
-        <div className="hero-image" aria-hidden="true">
-          <div className="robot-placeholder">
-            <span>AXON / FUTURE MACHINE</span>
-            <strong>HARDWARE<br />IN DEVELOPMENT</strong>
-            <small>NO PRODUCT CLAIMS // NO STOCK ROBOT</small>
+      <section id="top" className="hero-v2">
+        <div className="hero-v2-copy">
+          <p className="kicker">AXON CYBERNETICS / INDEPENDENT ROBOTICS</p>
+          <h1>INTELLIGENCE<br /><em>THAT MOVES.</em></h1>
+          <p className="hero-lead">We are engineering a future where artificial intelligence does not live behind a screen. It perceives the physical world, reasons about it and becomes capable of acting inside it.</p>
+          <div className="hero-meta"><span>01 / FUTURE ROBOTICS</span><span>02 / AI SYSTEMS</span><span>03 / EMBEDDED ENGINEERING</span></div>
+        </div>
+        <div className="hero-machine" aria-hidden="true">
+          <div className="hero-machine-top"><span>AXON DESIGN SYSTEM</span><span>STATUS // R&amp;D</span></div>
+          <div className="hero-robot">
+            <div className="robot-head"><span /></div><div className="robot-torso"><i /><b /><em /></div><div className="robot-arm left" /><div className="robot-arm right" /><div className="robot-leg left" /><div className="robot-leg right" />
           </div>
-          <div className="hero-crosshair">+</div>
-        </div>
-        <div className="hero-content">
-          <p className="kicker">INDEPENDENT ROBOTICS &amp; AI ENGINEERING COLLECTIVE</p>
-          <h1>BUILDING<br /><em>INTELLIGENCE</em><br />FOR THE REAL WORLD.</h1>
-          <p className="hero-copy">AXON CYBERNETICS is a two-founder engineering collective exploring what happens when artificial intelligence, robotics hardware and cloud systems are designed as one machine.</p>
-          <div className="hero-links">
-            <a className="button button-dark" href="#systems">EXPLORE AXON <span>↘</span></a>
-            <a className="text-link" href="#founders">MEET THE FOUNDERS <span>↗</span></a>
-          </div>
-          <div className="hero-note"><span>01</span> CURRENTLY BUILDING / RESEARCH + PROTOTYPING</div>
+          <div className="hero-machine-bottom"><span>FUTURE MACHINE / DESIGN STUDY</span><strong>NOT YET BUILT</strong></div>
         </div>
       </section>
 
-      <section className="statement-band">
-        <p>OUR APPROACH</p>
-        <h2>ROBOTS SHOULD NOT JUST<br /><span>OBEY COMMANDS.</span> THEY SHOULD<br />UNDERSTAND THE WORLD.</h2>
+      <section className="manifesto"><span>AXON / 2026</span><h2>THE NEXT GENERATION OF MACHINES<br /><em>WILL NEED TO UNDERSTAND.</em></h2><p>AXON is a two-founder engineering collective building toward autonomous robotics. The machines shown here are future programs and design directions — not products we claim to have already built.</p></section>
+
+      <section id="machines" className="section machines-section">
+        <div className="section-head"><div><p className="eyebrow">01 / FUTURE MACHINE PROGRAMS</p><h2>THE MACHINES<br />WE ARE BUILDING TOWARD.</h2></div><p className="section-intro">This is the core of AXON: a public showcase of future robotic systems, their intended missions and the engineering disciplines required to make them real.</p></div>
+        <div className="machine-grid"><MachineCard machine={machines[0]} featured /><MachineCard machine={machines[1]} /><MachineCard machine={machines[2]} /></div>
       </section>
 
-      <section id="systems" className="section systems-section">
-        <div className="section-head">
-          <div><p className="eyebrow">01 / WHAT WE ARE BUILDING</p><h2>SYSTEMS, NOT GIMMICKS.</h2></div>
-          <p className="section-intro">We are intentionally early. This platform documents the engineering journey rather than pretending a prototype already exists.</p>
-        </div>
-        <div className="feature-grid">
-          <article className="feature feature-main">
-            <div className="feature-index">AXON / 001</div>
-            <div className="feature-visual"><span>PRIMARY ROBOTIC PLATFORM</span><strong>COMING<br />THROUGH<br />ENGINEERING</strong><small>PHYSICAL HARDWARE NOT YET DEPLOYED</small></div>
-            <div className="feature-bottom"><h3>AI-NATIVE ROBOTICS</h3><p>A future platform for perception, reasoning and action in physical environments.</p></div>
-          </article>
-          <div className="feature-stack">
-            <article className="feature small-feature"><span className="feature-index">AXON / 002</span><div><p className="eyebrow">INFRASTRUCTURE</p><h3>GRIDPULSE</h3><p>Utility telemetry architecture exploring how distributed physical nodes can report verified real-world conditions.</p><span className="status">RESEARCH / ACTIVE</span></div></article>
-            <article className="feature small-feature light-feature"><span className="feature-index">AXON / 003</span><div><p className="eyebrow">RESEARCH</p><h3>THE AUTONOMY LAB</h3><p>Experiments in computer vision, AI decision systems, embedded control and mechanical robotics.</p><span className="status dark-status">BUILDING / NEXT</span></div></article>
-          </div>
+      <section id="intelligence" className="intelligence-section">
+        <div className="section intelligence-inner">
+          <div className="section-head"><div><p className="eyebrow">02 / THE INTELLIGENCE STACK</p><h2>FROM SENSOR<br />TO ACTION.</h2></div><p className="section-intro">Our long-term architecture connects perception, reasoning, software infrastructure and physical control into one continuous system.</p></div>
+          <div className="intelligence-grid">{intelligence.map(([num, title, text]) => <article key={num}><span>{num}</span><div className="stack-icon">{title === "SEE" ? "◉" : title === "UNDERSTAND" ? "⌬" : title === "DECIDE" ? "◇" : "↗"}</div><h3>{title}</h3><p>{text}</p></article>)}</div>
         </div>
       </section>
 
-      <section id="capabilities" className="capability-strip">
-        <div className="section capability-inner">
-          <div className="section-head compact"><div><p className="eyebrow">02 / CAPABILITIES</p><h2>ONE MACHINE.<br />MULTIPLE DISCIPLINES.</h2></div></div>
-          <div className="capability-grid">
-            {capabilities.map(([num, title, text]) => <article key={num}><span>{num}</span><h3>{title}</h3><p>{text}</p></article>)}
-          </div>
-        </div>
-      </section>
+      <section className="gridpulse-section"><div className="gridpulse-visual"><span>GRIDPULSE / 001</span><strong>PHYSICAL WORLD<br />→ DIGITAL STATE</strong><div className="pulse-lines" /></div><div className="gridpulse-copy"><p className="eyebrow">RESEARCH SYSTEM / GRIDPULSE</p><h2>THE WORLD<br />IS THE DATA.</h2><p>GRIDPULSE is AXON's infrastructure research direction: a telemetry architecture for distributed physical nodes, verified reports and real-world system state.</p><div className="gridpulse-list"><span>01 / EDGE SIGNALS</span><span>02 / VERIFIED EVENTS</span><span>03 / CLOUD STATE</span><span>04 / SYSTEM RESPONSE</span></div></div></section>
 
-      <section id="founders" className="section founders-section">
-        <div className="section-head"><div><p className="eyebrow">03 / FOUNDERS</p><h2>TWO ENGINEERS.<br />ONE SYSTEM.</h2></div><p className="section-intro">AXON is intentionally small. Every part of the system has an owner, and every future machine must connect software decisions to physical reality.</p></div>
-        <div className="founder-grid">
-          <article className="founder-card"><div className="portrait-placeholder"><span>KRM</span><small>SOFTWARE / CLOUD / AI</small></div><div className="founder-copy"><p className="eyebrow">SOFTWARE BRAIN</p><h3>KOGLESH R.<br />MURUGAN</h3><p>Lead Full-Stack Cloud Architecture &amp; Database Logic. Next.js, TypeScript, PostgreSQL, Supabase and Vercel.</p><div className="founder-role">LEAD SOFTWARE / CLOUD ARCHITECTURE</div></div></article>
-          <article className="founder-card"><div className="portrait-placeholder orange"><span>YM</span><small>EMBEDDED / ROBOTICS</small></div><div className="founder-copy"><p className="eyebrow">PHYSICAL BODY</p><h3>YENNAMUTAN<br />MUTHUKUMARAN</h3><p>Lead Embedded Systems, Robotics Chassis &amp; Mechanical Hardware Prototyping. C++, Python, computer vision and circuit design.</p><div className="founder-role">LEAD ROBOTICS / EMBEDDED ENGINEERING</div></div></article>
-        </div>
-      </section>
+      <section id="founders" className="section founders-section"><div className="section-head"><div><p className="eyebrow">03 / THE ENGINEERING TEAM</p><h2>TWO BRAINS.<br />ONE MACHINE.</h2></div><p className="section-intro">AXON stays small by design. Software and physical engineering are developed together from the beginning.</p></div><div className="founder-grid"><article><div className="founder-mark">KRM</div><p className="eyebrow">SOFTWARE BRAIN</p><h3>KOGLESH R.<br />MURUGAN</h3><p>Lead Full-Stack Cloud Architecture &amp; Database Logic. Next.js, TypeScript, PostgreSQL, Supabase and Vercel.</p><strong>SOFTWARE / CLOUD / AI</strong></article><article className="founder-orange"><div className="founder-mark">YM</div><p className="eyebrow">PHYSICAL BODY</p><h3>YENNAMUTAN<br />MUTHUKUMARAN</h3><p>Lead Embedded Systems, Robotics Chassis &amp; Mechanical Hardware Prototyping. C++, Python, computer vision and circuit design.</p><strong>ROBOTICS / EMBEDDED / HARDWARE</strong></article></div></section>
 
-      <section className="principle-band"><div><p className="eyebrow">ENGINEERING PRINCIPLE</p><h2>IF IT CANNOT SURVIVE<br /><span>REAL-WORLD TESTING,</span><br />IT IS NOT FINISHED.</h2></div><div className="principle-number">AX<br />/02</div></section>
+      <section id="roadmap" className="roadmap-v2"><div className="section"><div className="section-head"><div><p className="eyebrow">04 / ROADMAP</p><h2>CONCEPT.<br />PROTOTYPE.<br />MACHINE.</h2></div><p className="section-intro">No fake deployments. No imaginary customers. No pretending a concept is a finished robot. Every stage becomes public when the engineering earns it.</p></div><div className="roadmap-grid">{roadmap.map(([num, title, text]) => <article key={num}><span>{num}</span><h3>{title}</h3><p>{text}</p><b>↗</b></article>)}</div></div></section>
 
-      <section id="roadmap" className="section roadmap-section">
-        <div className="section-head"><div><p className="eyebrow">04 / ROADMAP</p><h2>FROM IDEA<br />TO MACHINE.</h2></div><p className="section-intro">No invented customer list. No imaginary fleet. No fake deployment numbers. The public record grows only when the engineering does.</p></div>
-        <div className="roadmap-list">{roadmap.map(([num, title, text]) => <article key={num}><span>{num}</span><div><h3>{title}</h3><p>{text}</p></div><b>↗</b></article>)}</div>
-      </section>
-
-      <section id="contact" className="contact-section"><p className="eyebrow">AXON CYBERNETICS / 2026</p><h2>THE MACHINE<br /><em>IS NEXT.</em></h2><p>For engineering collaboration, exhibition opportunities or technical enquiries, follow the public build record and contact the founders through their professional channels.</p><a className="button button-light" href="https://github.com/kogleshofficial-hub/axon-cybernetics">VIEW BUILD LOG <span>↗</span></a></section>
-
-      <footer className="site-footer"><div className="footer-brand"><span className="logo-box">AX</span><strong>AXON CYBERNETICS</strong></div><div>AI ROBOTICS / EMBEDDED SYSTEMS / CLOUD INTELLIGENCE</div><div>© 2026 AXON CYBERNETICS</div></footer>
+      <section className="closing"><p>AXON CYBERNETICS / INDEPENDENT ROBOTICS &amp; AI</p><h2>THE BODY<br /><em>COMES NEXT.</em></h2><a href="https://github.com/kogleshofficial-hub/axon-cybernetics">FOLLOW THE BUILD RECORD ↗</a></section>
+      <footer><div><span className="logo-box">AX</span><strong>AXON CYBERNETICS</strong></div><span>INTELLIGENCE THAT MOVES.</span><span>© 2026</span></footer>
     </main>
   );
 }
