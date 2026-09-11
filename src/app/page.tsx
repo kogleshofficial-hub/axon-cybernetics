@@ -68,6 +68,6 @@ export default function Home() {
     <section id="roadmap" className="roadmap-v2"><div className="section"><div className="section-head"><div><p className="eyebrow">04 / ROADMAP</p><h2>CONCEPT.<br />PROTOTYPE.<br />MACHINE.</h2></div><p className="section-intro">No fake deployments. No imaginary customers. No pretending a concept is a finished robot.</p></div><div className="roadmap-grid">{roadmap.map(([num,title,text]) => <article key={num}><span>{num}</span><h3>{title}</h3><p>{text}</p><b>↗</b></article>)}</div></div></section>
 
     <section className="closing"><p>AXON CYBERNETICS / INDEPENDENT ROBOTICS &amp; AI</p><h2>THE BODY<br /><em>COMES NEXT.</em></h2><a href="https://github.com/kogleshofficial-hub/axon-cybernetics">OPEN BUILD RECORD ↗</a></section>
-    <footer><div><span className="logo-box">AX</span><strong>AXON CYBERNETICS</strong></div><span>INTELLIGENCE THAT MOVES.</span><span>© 2026</span></footer>
+    <footer><div><span className="logo-box">AX</span><strong>AXON CYBERNETICS</strong></div><div className="founder-credit"><span>FOUNDED BY</span><strong>KOGLESH R. MURUGAN</strong><strong>YENNAMUTAN MUTHUKUMARAN</strong></div><span>INTELLIGENCE THAT MOVES.</span><span>© 2026</span></footer>
   </main>;
 }
