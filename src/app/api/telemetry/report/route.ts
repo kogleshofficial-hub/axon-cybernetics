@@ -7,7 +7,6 @@ export const dynamic = "force-dynamic";
 
 const MAX_BODY_BYTES = 32 * 1024;
 const MAX_NODE_ID_LENGTH = 96;
-const TOKEN_HASH_HEX_LENGTH = 64;
 
 const globalForGridPulse = globalThis as unknown as {
   gridPulsePool?: Pool;
@@ -15,10 +14,7 @@ const globalForGridPulse = globalThis as unknown as {
 
 function getPool(): Pool {
   const connectionString = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
-
-  if (!connectionString) {
-    throw new Error("DATABASE_URL or POSTGRES_URL is not configured");
-  }
+  if (!connectionString) throw new Error("DATABASE_URL or POSTGRES_URL is not configured");
 
   if (!globalForGridPulse.gridPulsePool) {
     globalForGridPulse.gridPulsePool = new Pool({
@@ -84,9 +80,7 @@ function optionalFiniteNumber(value: unknown, field: string): number | null {
 function parseTimestamp(value: unknown, field: string): Date {
   const raw = requiredString(value, field, 64);
   const parsed = new Date(raw);
-  if (Number.isNaN(parsed.getTime())) {
-    throw new Error(`${field} must be a valid ISO-8601 timestamp`);
-  }
+  if (Number.isNaN(parsed.getTime())) throw new Error(`${field} must be a valid ISO-8601 timestamp`);
   return parsed;
 }
 
@@ -100,23 +94,43 @@ function tokensMatch(received: string, expected: string): boolean {
   return receivedHash.length === expectedHash.length && timingSafeEqual(receivedHash, expectedHash);
 }
 
-function normalizePayload(input: unknown): NormalizedTelemetry {
-  if (!isPlainObject(input)) {
-    throw new Error("Request body must be a JSON object");
+function configuredNodeTokens(): Record<string, string> {
+  const mapping = process.env.GRIDPULSE_NODE_TOKENS;
+
+  if (mapping) {
+    try {
+      const parsed: unknown = JSON.parse(mapping);
+      if (!isPlainObject(parsed)) throw new Error("GRIDPULSE_NODE_TOKENS must be a JSON object");
+
+      const output: Record<string, string> = {};
+      for (const [nodeId, token] of Object.entries(parsed)) {
+        if (!/^[A-Za-z0-9._:-]{2,96}$/.test(nodeId) || typeof token !== "string" || token.length < 24) {
+          throw new Error("Invalid GRIDPULSE_NODE_TOKENS entry");
+        }
+        output[nodeId] = token;
+      }
+      return output;
+    } catch (error) {
+      console.error("Invalid GRIDPULSE_NODE_TOKENS", error);
+      return {};
+    }
   }
 
+  const fallback = process.env.GRIDPULSE_INGEST_TOKEN;
+  return fallback ? { "NODE-DEFAULT": fallback } : {};
+}
+
+function normalizePayload(input: unknown): NormalizedTelemetry {
+  if (!isPlainObject(input)) throw new Error("Request body must be a JSON object");
   const payload = input as Record<string, unknown>;
+
   const nodeId = requiredString(payload.nodeId, "nodeId", MAX_NODE_ID_LENGTH);
   const nodeToken = requiredString(payload.nodeToken, "nodeToken", 256);
   const latitude = optionalFiniteNumber(payload.latitude, "latitude");
   const longitude = optionalFiniteNumber(payload.longitude, "longitude");
 
-  if (latitude === null || latitude < -90 || latitude > 90) {
-    throw new Error("latitude must be between -90 and 90");
-  }
-  if (longitude === null || longitude < -180 || longitude > 180) {
-    throw new Error("longitude must be between -180 and 180");
-  }
+  if (latitude === null || latitude < -90 || latitude > 90) throw new Error("latitude must be between -90 and 90");
+  if (longitude === null || longitude < -180 || longitude > 180) throw new Error("longitude must be between -180 and 180");
 
   const reportedAt = parseTimestamp(payload.reportedAt, "reportedAt");
   const outageStartedAt = parseTimestamp(payload.outageStartedAt, "outageStartedAt");
@@ -126,13 +140,8 @@ function normalizePayload(input: unknown): NormalizedTelemetry {
       : parseTimestamp(payload.outageResolvedAt, "outageResolvedAt");
 
   const now = Date.now();
-  const tenMinutes = 10 * 60 * 1000;
-  if (reportedAt.getTime() > now + tenMinutes) {
-    throw new Error("reportedAt is too far in the future");
-  }
-  if (outageStartedAt.getTime() > reportedAt.getTime()) {
-    throw new Error("outageStartedAt cannot be after reportedAt");
-  }
+  if (reportedAt.getTime() > now + 10 * 60 * 1000) throw new Error("reportedAt is too far in the future");
+  if (outageStartedAt.getTime() > reportedAt.getTime()) throw new Error("outageStartedAt cannot be after reportedAt");
   if (outageResolvedAt && outageResolvedAt.getTime() < outageStartedAt.getTime()) {
     throw new Error("outageResolvedAt cannot be before outageStartedAt");
   }
@@ -143,19 +152,16 @@ function normalizePayload(input: unknown): NormalizedTelemetry {
   }
 
   const voltageV = optionalFiniteNumber(payload.voltageV, "voltageV");
-  if (voltageV !== null && (voltageV < 0 || voltageV > 1000)) {
-    throw new Error("voltageV must be between 0 and 1000");
-  }
+  if (voltageV !== null && (voltageV < 0 || voltageV > 1000)) throw new Error("voltageV must be between 0 and 1000");
 
   const frequencyHz = optionalFiniteNumber(payload.frequencyHz, "frequencyHz");
   if (frequencyHz !== null && (frequencyHz < 0 || frequencyHz > 1000)) {
     throw new Error("frequencyHz must be between 0 and 1000");
   }
 
-  const payloadVersion =
-    payload.payloadVersion === undefined
-      ? "1.0"
-      : requiredString(payload.payloadVersion, "payloadVersion", 32);
+  const payloadVersion = payload.payloadVersion === undefined
+    ? "1.0"
+    : requiredString(payload.payloadVersion, "payloadVersion", 32);
 
   return {
     nodeId,
@@ -174,14 +180,10 @@ function normalizePayload(input: unknown): NormalizedTelemetry {
 
 async function readJson(request: Request): Promise<unknown> {
   const contentLength = request.headers.get("content-length");
-  if (contentLength && Number(contentLength) > MAX_BODY_BYTES) {
-    throw new Error("Payload exceeds 32 KB limit");
-  }
+  if (contentLength && Number(contentLength) > MAX_BODY_BYTES) throw new Error("Payload exceeds 32 KB limit");
 
   const raw = await request.text();
-  if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) {
-    throw new Error("Payload exceeds 32 KB limit");
-  }
+  if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) throw new Error("Payload exceeds 32 KB limit");
 
   try {
     return JSON.parse(raw);
@@ -190,11 +192,25 @@ async function readJson(request: Request): Promise<unknown> {
   }
 }
 
-async function insertTelemetry(
-  client: PoolClient,
-  telemetry: NormalizedTelemetry,
-): Promise<string> {
+async function insertTelemetry(client: PoolClient, telemetry: NormalizedTelemetry): Promise<string> {
   await client.query("SET LOCAL app.gridpulse_ingest = 'true'");
+
+  const registryResult = await client.query(
+    `
+      INSERT INTO gridpulse.reporting_nodes (node_id, reporting_node_token_hash, last_seen_at, active)
+      VALUES ($1, $2, now(), true)
+      ON CONFLICT (node_id)
+      DO UPDATE SET
+        last_seen_at = now(),
+        active = true
+      WHERE gridpulse.reporting_nodes.reporting_node_token_hash = EXCLUDED.reporting_node_token_hash
+    `,
+    [telemetry.nodeId, telemetry.tokenHash],
+  );
+
+  if (registryResult.rowCount !== 1) {
+    throw new Error("Reporting node identity conflict");
+  }
 
   const result = await client.query<{ id: string }>(
     `
@@ -235,12 +251,6 @@ async function insertTelemetry(
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const expectedToken = process.env.GRIDPULSE_INGEST_TOKEN;
-  if (!expectedToken) {
-    console.error("GRIDPULSE_INGEST_TOKEN is not configured");
-    return NextResponse.json({ ok: false, error: "Service misconfiguration" }, { status: 500 });
-  }
-
   const contentType = request.headers.get("content-type") ?? "";
   if (!contentType.toLowerCase().includes("application/json")) {
     return NextResponse.json({ ok: false, error: "Content-Type must be application/json" }, { status: 415 });
@@ -249,12 +259,16 @@ export async function POST(request: Request): Promise<NextResponse> {
   let telemetry: NormalizedTelemetry;
   try {
     const body = await readJson(request);
-    if (!isPlainObject(body)) {
-      return NextResponse.json({ ok: false, error: "Invalid telemetry payload" }, { status: 400 });
-    }
+    if (!isPlainObject(body)) return NextResponse.json({ ok: false, error: "Invalid telemetry payload" }, { status: 400 });
 
     const candidateToken = body.nodeToken;
-    if (typeof candidateToken !== "string" || !tokensMatch(candidateToken, expectedToken)) {
+    const nodeId = body.nodeId;
+    if (typeof candidateToken !== "string" || typeof nodeId !== "string") {
+      return NextResponse.json({ ok: false, error: "nodeId and nodeToken are required" }, { status: 400 });
+    }
+
+    const configuredToken = configuredNodeTokens()[nodeId];
+    if (!configuredToken || !tokensMatch(candidateToken, configuredToken)) {
       return NextResponse.json({ ok: false, error: "Unauthorized reporting node" }, { status: 401 });
     }
 
@@ -270,38 +284,21 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     client = await pool.connect();
     await client.query("BEGIN");
-
     const telemetryId = await insertTelemetry(client, telemetry);
-
     await client.query("COMMIT");
 
     return NextResponse.json(
-      {
-        ok: true,
-        accepted: true,
-        telemetryId,
-        receivedAt: new Date().toISOString(),
-      },
-      {
-        status: 201,
-        headers: { "Cache-Control": "no-store" },
-      },
+      { ok: true, accepted: true, telemetryId, receivedAt: new Date().toISOString() },
+      { status: 201, headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
     if (client) {
-      try {
-        await client.query("ROLLBACK");
-      } catch (rollbackError) {
-        console.error("GRIDPULSE rollback failed", rollbackError);
-      }
+      try { await client.query("ROLLBACK"); } catch (rollbackError) { console.error("GRIDPULSE rollback failed", rollbackError); }
     }
 
-    const code = (error as { code?: string } | null)?.code;
-    if (code === "23505") {
-      return NextResponse.json(
-        { ok: false, error: "Telemetry conflict: duplicate node event" },
-        { status: 409 },
-      );
+    const message = error instanceof Error ? error.message : "Telemetry transaction failed";
+    if (message === "Reporting node identity conflict") {
+      return NextResponse.json({ ok: false, error: message }, { status: 409 });
     }
 
     console.error("GRIDPULSE telemetry ingestion failed", error);
@@ -313,12 +310,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 export async function GET(): Promise<NextResponse> {
   return NextResponse.json(
-    {
-      ok: true,
-      service: "GRIDPULSE telemetry ingestion",
-      status: "READY",
-      method: "POST",
-    },
+    { ok: true, service: "GRIDPULSE telemetry ingestion", status: "READY", method: "POST" },
     { headers: { "Cache-Control": "no-store" } },
   );
 }
+
+export type { TelemetryPayload };
